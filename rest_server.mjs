@@ -65,7 +65,15 @@ app.get('/codes', (req, res) => {
     
     // get all codes from db
     let query = 'SELECT code, incident_type as type FROM Codes ORDER BY code';
-    db.all(query, [], (err, rows) => {
+    let params = [];
+    if (req.query.code) {
+        let codes = req.query.code.split(',').map(code => code.trim());
+        let placeholders = codes.map(() => '?').join(',');
+        query += ` WHERE code IN (${placeholders})`;
+        params = codes;
+    }
+    query += ' ORDER BY code';
+    db.all(query, params, (err, rows) => {
         if (err) {
             res.status(500).send(err);
         } else {
@@ -83,7 +91,15 @@ app.get('/neighborhoods', (req, res) => {
     
     // get all neighborhoods from db
     let query = 'SELECT neighborhood_number as id, neighborhood_name as name FROM Neighborhoods ORDER BY neighborhood_number';
-    db.all(query, [], (err, rows) => {
+    let params = [];
+    if (req.query.id) {
+        let ids = req.query.id.split(',').map(id => id.trim());
+        let placeholders = ids.map(() => '?').join(',');
+        query += ` WHERE neighborhood_number IN (${placeholders})`;
+        params = ids;
+    }
+    query += ' ORDER BY neighborhood_number';
+    db.all(query, params, (err, rows) => {
         if (err) {
             res.status(500).send(err);
         } else {
